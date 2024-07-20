@@ -1,3 +1,8 @@
+use std::str::FromStr;
+
+use nom::{branch::alt, bytes::complete::tag, combinator::value, IResult};
+
+#[derive(Copy, Clone)]
 pub enum Pin {
     P0,
     P1,
@@ -5,6 +10,19 @@ pub enum Pin {
     X1,
     X2,
     X3,
+}
+
+impl Pin {
+    pub fn lex_from_str(input: &str) -> IResult<&str, Self> {
+        alt((
+            value(Pin::P0, tag("p0")),
+            value(Pin::P1, tag("p1")),
+            value(Pin::X0, tag("x0")),
+            value(Pin::X1, tag("x1")),
+            value(Pin::X2, tag("x2")),
+            value(Pin::X3, tag("x3")),
+        ))(input)
+    }
 }
 
 pub enum Register {
@@ -25,7 +43,7 @@ pub enum RegImm {
 pub enum Opcode {
     Nop,
     MovReg(RegImm, Register),
-    Jmp(u8),
+    Jmp(Label),
     Slp(RegImm),
     Add(RegImm),
     Sub(RegImm),
