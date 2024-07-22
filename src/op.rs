@@ -10,6 +10,8 @@ use nom::{
     Finish, IResult,
 };
 
+use crate::device::Device;
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Pin {
     P0,
@@ -65,7 +67,7 @@ impl Label {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Condition(bool);
+pub struct Condition(pub bool);
 
 impl Condition {
     pub fn lex_from_str(input: &str) -> IResult<&str, Self> {
@@ -208,9 +210,9 @@ impl Opcode {
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct LOC {
-    cond: Option<Condition>,
-    lab: Option<Label>,
-    op: Option<Opcode>,
+    pub cond: Option<Condition>,
+    pub lab: Option<Label>,
+    pub op: Option<Opcode>,
 }
 
 impl LOC {
