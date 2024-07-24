@@ -81,14 +81,14 @@ impl Condition {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RegImm {
     Reg(Register),
-    Imm(u16),
+    Imm(i16),
 }
 
 impl RegImm {
     pub fn lex_from_str(input: &str) -> IResult<&str, Self> {
         alt((
             map(Register::lex_from_str, RegImm::Reg),
-            map(complete::u16, RegImm::Imm),
+            map(complete::i16, RegImm::Imm),
         ))(input)
     }
 }
