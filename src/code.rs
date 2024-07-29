@@ -10,8 +10,6 @@ use nom::{
     Finish, IResult,
 };
 
-use crate::device::Device;
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Pin {
     P0,
@@ -214,13 +212,13 @@ impl Opcode {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct LOC {
+pub struct Loc {
     pub cond: Option<Condition>,
     pub lab: Option<Label>,
     pub op: Option<Opcode>,
 }
 
-impl LOC {
+impl Loc {
     pub fn lex_from_str(input: &str) -> IResult<&str, Self> {
         map(
             tuple((
@@ -251,11 +249,11 @@ impl LOC {
     }
 }
 
-impl FromStr for LOC {
+impl FromStr for Loc {
     type Err = nom::error::Error<String>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match LOC::lex_from_str(s).finish() {
+        match Loc::lex_from_str(s).finish() {
             Ok((_remaining, loc)) => Ok(loc),
             Err(nom::error::Error { input, code }) => Err(nom::error::Error {
                 input: input.to_string(),

@@ -1,4 +1,4 @@
-use crate::device::{Device, Wire};
+use crate::device::{Attachment, Device};
 
 struct GlobalState {
     seconds: u32,
@@ -17,14 +17,10 @@ impl GlobalState {
 struct Board {
     state: GlobalState,
     devices: Vec<Box<dyn Device>>,
-    wires: Vec<Box<dyn Wire>>,
+    wires: Vec<Attachment>,
 }
 
 impl Board {
-    pub fn advance(&mut self) {
-        while (self.devices.iter().all(|d| d))
-        for device in self.devices.iter_mut() {
-            device.step();
-        }
-    }
+    pub fn advance(&mut self) {}
 }
+
