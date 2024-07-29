@@ -67,13 +67,18 @@ impl Label {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Condition(pub bool);
+pub enum Condition {
+    True,
+    False,
+    Once,
+}
 
 impl Condition {
     pub fn lex_from_str(input: &str) -> IResult<&str, Self> {
         alt((
-            value(Condition(true), tag("+")),
-            value(Condition(false), tag("-")),
+            value(Condition::True, tag("+")),
+            value(Condition::False, tag("-")),
+            value(Condition::Once, tag("@")),
         ))(input)
     }
 }

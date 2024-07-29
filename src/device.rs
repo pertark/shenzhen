@@ -6,6 +6,7 @@ use crate::op::{Condition, Opcode, Pin, RegImm, Register, LOC};
 pub trait Device {
     fn step(&mut self);
     fn get_pin(&self, pin: Pin) -> Option<Rc<RefCell<dyn Wire>>>;
+    fn set_pin(&self, pin: Pin, val: i16);
     fn get_acc(&self) -> Option<i16>;
     fn set_acc(&mut self, val: i16);
     fn get_dat(&self) -> Option<i16>;
@@ -16,7 +17,7 @@ pub trait Device {
 
 #[derive(Clone, Copy)]
 pub enum DeviceState {
-    Sleep,
+    Sleep(u32),
     Exec,
     Write,
     Read,
@@ -125,13 +126,20 @@ struct MC4000 {
     acc: i16,
     state: DeviceState,
     pins: [Option<Rc<RefCell<dyn Wire>>>; 4],
+    pin_vals: [Option<i16>; 4],
     code: Code<9>,
 }
 
 impl Device for MC4000 {
     fn step(&mut self) {
-        if let Some(code) = self.code.step() {
-            exec(code, self);
+        match self.state {
+            DeviceState::Exec => {
+                if let Some(code) = self.code.step() {
+                    exec(code, self);
+                }
+            },
+            // Read and Write are XBus operations.
+            _ => {}
         }
     }
     fn get_pin(&self, pin: Pin) -> Option<Rc<RefCell<dyn Wire>>> {
@@ -143,6 +151,15 @@ impl Device for MC4000 {
             _ => None,
         }
     }
+    fn set_pin(&self, pin: Pin, val: i16) {
+        let i = match pin {
+            Pin::P0 => 0,
+            Pin::P1 => 1,
+            Pin::X0 => 2,
+            Pin::X1 => 3,
+            _ => panic!("bad pin"),
+        };
+    }
     fn get_acc(&self) -> Option<i16> {
         Some(self.acc)
     }
@@ -152,15 +169,15 @@ impl Device for MC4000 {
     fn get_dat(&self) -> Option<i16> {
         None
     }
-    fn set_dat(&mut self, val: i16) {
+    fn set_dat(&mut self, _val: i16) {
         panic!("bad")
     }
     fn set_cnd(&mut self, cnd: CondState) {
         self.code.state = cnd;
     }
     fn sleep(&mut self, duration: i16) {
-        // mimi
-        self.state = DeviceState::Sleep;
+        let t = if duration < 0 { 0 } else { duration as u32 };
+        self.state = DeviceState::Sleep(t);
     }
 }
 
