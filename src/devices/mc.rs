@@ -54,6 +54,9 @@ pub fn execute_loc(loc: Loc, device: &mut dyn McDevice) {
             let acc = device.read_reg(Register::Acc);
             let pos = device.read_reg_or_imm(r1) + 1;
             let dgt = device.read_reg_or_imm(r2); // TODO: check that it's between 0-9.
+            if !(0..9).contains(&dgt) {
+                panic!("invalid dst value");
+            }
             let sign = acc.signum();
             let next = acc - sign * (acc.abs() % 10i16.pow(pos as u32))
                 + sign * (acc.abs() % 10i16.pow(pos as u32 - 1))
@@ -99,10 +102,10 @@ impl McDevice for MC4000 {
             Register::Acc => self.regs[0],
             Register::Dat => panic!("dat does not exist"),
             Register::Pin(p) => match p {
-                P0 => self.regs[1],
-                P1 => self.regs[2],
-                X0 => self.regs[3],
-                X1 => self.regs[4],
+                P0 => self.attachments.0.map(|x| x.read_from()).unwrap_or(0),
+                P1 => self.attachments.1.map(|x| x.read_from()).unwrap_or(0),
+                X0 => todo!(),
+                X1 => todo!(),
                 X2 => panic!("x2 does not exist"),
                 X3 => panic!("x3 does not exist"),
             },
@@ -176,10 +179,10 @@ impl McDevice for MC4000X {
             Register::Pin(p) => match p {
                 P0 => panic!("p0 does not exist"),
                 P1 => panic!("p1 does not exist"),
-                X0 => self.regs[1],
-                X1 => self.regs[2],
-                X2 => self.regs[3],
-                X3 => self.regs[4],
+                X0 => todo!(),
+                X1 => todo!(),
+                X2 => todo!(),
+                X3 => todo!(),
             },
         }
     }
@@ -233,12 +236,12 @@ impl McDevice for MC6000 {
             Register::Acc => self.regs[0],
             Register::Dat => self.regs[1],
             Register::Pin(p) => match p {
-                P0 => self.regs[2],
-                P1 => self.regs[3],
-                X0 => self.regs[4],
-                X1 => self.regs[5],
-                X2 => self.regs[6],
-                X3 => self.regs[7],
+                P0 => self.attachments.0[0].map(|x| x.read_from()).unwrap_or(0),
+                P1 => self.attachments.0[1].map(|x| x.read_from()).unwrap_or(0),
+                X0 => todo!(),
+                X1 => todo!(),
+                X2 => todo!(),
+                X3 => todo!(),
             },
         }
     }

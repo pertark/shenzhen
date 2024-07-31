@@ -105,6 +105,10 @@ impl SimpleIOWire {
     pub fn push_update_with(&mut self, data: i16) {
         todo!();
     }
+
+    pub fn read_from(&self) -> i16 {
+        todo!();
+    }
 }
 
 #[derive(Copy, Clone)]
